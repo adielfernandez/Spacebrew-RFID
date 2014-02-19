@@ -24,7 +24,7 @@ String description = "Receives JSON formatted RFID data";
 //User "database". Arrays to hold names, RFID tags and images.
 String people[] = {"Doge","Joseph Ducreux","Nicholas Cage","Grumpy Cat","Disaster Girl"};
 String tags[] = {"50005C8A7EF8","50005C9EB220","50005BC23BF2","50005C2D99B8","50005B869F12"};
-PImage images[] = new PImage[numUsers];
+PImage images[] = new PImage[5];
 
 
 //strings to hold RFID data locally
