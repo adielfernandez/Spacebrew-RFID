@@ -27,8 +27,10 @@ String server = "sandbox.spacebrew.cc";
 String name = "Turret controller";
 String description = "Receives JSON formatted accelerometer data";
 
-
+//variables to store incomming accelerometer values
 float x, y, z;
+
+//variables for state of turret
 float pan = 90; 
 float tilt = 90;
 int firing = 0;
@@ -78,18 +80,21 @@ void draw(){
     text("Not Firing", 20, 150);    
   }
   
-  
-
+  //if the joystick is leaned over to one side or the other (i.e. z is > 0.5
+  //or less than -0.5, increment the angle of the pan servo between 0 and 180
   if(z > 0.5 && pan > 0){
     pan -= 1.2;
   } else if(z < -0.5 && pan < 180){
     pan += 1.2;
   }
   
+  //make sure the servo doesnt go past 0 or 180, just in case
   pan = constrain(pan, 0, 180);
+  
+  //directly map the value of the accelerometer's y valye to the tilt of the laser
   tilt = map(y, -1, 1, 45, 160);
 
-
+  //send the three values to arduino
   sendData(round(pan), round(tilt), firing);  
 
 
@@ -106,6 +111,8 @@ void sendData(int _pan, int _tilt, int _fire) {
   out[1] = byte(_tilt);
   out[2] = byte(_fire);
   port.write(out);
+  
+  //print to console to debug
   println(_pan + ", " + _tilt + ", " + _fire);
 }
 
