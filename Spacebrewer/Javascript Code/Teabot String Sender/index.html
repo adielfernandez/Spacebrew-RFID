@@ -1,0 +1,159 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Spacebrew String</title>
+
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="css/reset.css" type="text/css" media="screen" charset="utf-8" />
+		<link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+		<script type="text/javascript" src="js/jq.js"></script>
+		<script type="text/javascript" src="js/sb-1.3.0.js"></script>
+
+		<script type="text/javascript">
+		  
+			// when window loads call the setup method
+			$(window).on("load", setup);
+
+			// Spacebrew Object
+			var sb
+				, app_name = "string example"
+				;
+
+			/**
+			* setup Function that connect to spacebrew and creates a listener for clicks of the submit button.
+			*/
+			function setup (){
+				var random_id = "0000" + Math.floor(Math.random() * 10000)
+					;
+
+				//app_name = app_name + ' ' + random_id.substring(random_id.length-4);
+				app_name = "Teabot Mobile";
+
+				// setup spacebrew
+				sb = new Spacebrew.Client();  // create spacebrew client object
+
+				sb.name(app_name);
+				sb.description("This app sends a command to make tea with X sugar cubes."); // set the app description
+
+		        // create the spacebrew subscription channels
+				sb.addPublish("Number of sugars", "string", "");	// create the publication feed
+				sb.addSubscribe("Not currently used", "string");		// create the subscription feed
+
+				// configure the publication and subscription feeds
+				sb.onStringMessage = onStringMessage;		
+				sb.onOpen = onOpen;
+
+				// connect to spacbrew
+				sb.connect();  
+
+				// listen to button clicks
+				$("#button").on("mousedown", onMouseDown);
+			}
+
+			/**
+			 * Function that is called when Spacebrew connection is established
+			 */
+			function onOpen() {
+				var message = "Connected as <strong>" + sb.name() + "</strong>. ";
+				if (sb.name() === app_name) {
+					//message += "<br>You can customize this app's name in the query string by adding <strong>name=your_app_name</strong>."
+				}
+				$("#name").html( message );
+			}
+
+			/**
+			* onMouseDown Function that is called when the submit button is pressed. It reads the
+			*     text in the input box, and then sends it to spacebrew. It accepts a mouse event
+			*     object, though we don't use it in this example.
+			*/
+			function onMouseDown (evt){
+				var newString = $("#string").val();   // load text from input box
+				if (newString !== "") {               // if input box is not blank
+					console.log("Sending message " + newString); 
+					sb.send("Number of sugars", "string", newString);   // send string to spacebrew
+					
+					$("#string").val("");                   // clear the text box
+					
+					//calculate the date and time
+					var today = new Date();
+					var dd = today.getDate();
+					var mm = today.getMonth()+1; //January is 0!
+					var yyyy = today.getFullYear();
+					var hour = today.getHours();
+					var min = today.getMinutes();
+
+
+					//format it a little nicer
+					if(dd<10) {
+					    dd='0'+dd
+					} 
+
+					if(mm<10) {
+					    mm='0'+mm
+					} 
+
+					var ampm = 'am';
+
+					if(hour > 12){
+						hour = hour - 12
+						ampm = 'pm'
+					}
+
+					if(hour < 10) {
+					    hour ='0'+ hour
+					} 
+
+					if(min < 10){
+						min = '0' + min
+					}
+
+					today =  hour+':'+ min + ' ' + ampm + ' on ' + mm+'/'+dd+'/'+yyyy;
+
+
+					var sentMessage = "Tea with " + newString + " sugar(s) requested at " + today;
+					$("#status").text(sentMessage); // display the sent message in the browser         
+				}
+			}
+
+			/**
+			 * onStringMessage Function that is called whenever new spacebrew string messages are received.
+			 *          It accepts two parameters:
+			 * @param  {String} name    Holds name of the subscription feed channel
+			 * @param  {String} value 	Holds value received from the subscription feed
+			 */
+			function onStringMessage( name, value ){
+				console.log("[onBooleanMessage] boolean message received ", value);
+				$("#msg_received").text(value); // display the sent message in the browser         
+			}
+
+	    </script>
+	</head>
+
+	<body>
+		<h1>
+			How many sugar cubes would you like in your tea today? 
+		</h1>
+		<h3>
+			(Only numbers from 0-3, please)
+		</h3>
+
+		<div>
+			<input id="string" style="height: 30px; width: 350px; font-size: 30px;"/>
+			<a class="button" id="button">Send</a>
+		</div>
+		<h2>
+			Last Request: <span id="status"/> 
+		</h2>
+
+		<br>
+		
+		<h2>
+<!-- 			<b>Received Message: </b><span id="msg_received"/> -->
+		</h2>
+
+		</br></br>
+		<div id="name">Trying to connect</div>
+
+	</body>
+
+</html>
