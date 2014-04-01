@@ -10,15 +10,16 @@ tea servo           pin 12      (move forward at servo val = 99 until teabag det
 IR Detector         pin A0
 IR Emitter          (not attached to IO pin, always on)
 
-debugButton         pin 2
-
-
  Serial Data parsing taken from Greg Borenstein
  https://gist.github.com/atduskgreg/1349176
- 
+
+
+by Adiel Fernandez and Stephanie Burgess, March 2014 
  
 
 */
+
+
 
 //Import servo library
 #include <Servo.h>
@@ -37,6 +38,9 @@ Servo sugarServo;
 Servo teaServo;
 
 //servo states (i.e. degree values for behaviors)
+//NOTE: you will have to change these values to 
+//ones that correspond to your servos!
+
 //for on/off servo
 int ON = 130;
 int OFF = 100;
@@ -59,23 +63,27 @@ int IRPin = A0;
 int IRVal = 0;
 int IRThreshold = 700;
 
-int debugButtonPin = 2;
+//Some booleans that help us control what is going on
 boolean makeTea = false;
 boolean bagDropped = false;
 
 
-int heatingWaitTime = 5000;    //2 min = 120,000 ms
+//how much time to wait for the water to heat before pouring
+int heatTime = 55000;
 
-int pourTime = 10000;
+//How long to keep the pouring valve open
+int pourTime = 13000;
 
+//The number of sugars to drop in a given cup
 int numSugars = 0;
 
 
 
 void setup(){
+  //open the serial port for debugging purposes
   Serial.begin(9600);
   
-  //attach servos
+  //attach servos to their pins
   ONServo.attach(9);
   POURServo.attach(10);
   sugarServo.attach(11);
@@ -116,33 +124,26 @@ void loop(){
       //other variable         = values[1];
       //other other variable   = values[2];
       
-      //once we've received all three variables, we're ready to make the makeTea boolean true
+      //once we've received all three variables, we're ready to 
+      //make the makeTea and bagDropped booleans true
       makeTea = true;
       bagDropped = false;
       
     }
   }  
   
-  
-  
-  //if we press the button reset states
-  if(digitalRead(debugButtonPin) == 1){
-    makeTea = true;
-    bagDropped = false;
-    Serial.println("Lets make some tea");
-  }
-  
-  
+  //if we actually want to make tea:
   if(makeTea){
     
+    
     //turn on water heater
-
     Serial.println("Turning on heater");
     ONServo.write(ON);
     delay(600);
     ONServo.write(OFF);
     
-    //dispense sugar cube depending on numSugars variable
+    
+    //dispense sugar cube using a for loop depending on numSugars variable
     Serial.println("Dropping Sugar Cubes");
     for(int i = 0; i < numSugars; i++){
       sugarServo.write(PULLBACK);
@@ -153,11 +154,19 @@ void loop(){
   
     //drop teabag
     Serial.println("Looking for teabag...");
+    //we use a while loop to make sure we are doing nothing except
+    //looking for when a teabag has been dropped to make sure we
+    //dont miss it and accidentally drop two
     while(bagDropped == false){
+      //turn the continuous rotation servo slowly
       teaServo.write(TURN);
       delay(20);
+      //read the IR emitter
       IRVal = analogRead(IRPin);
       
+      //if the value falls below a certain threshold (stated above)
+      //i.e. a tea bag is blocking the detector, then stop the servo
+      //and change the bagDropped boolean so we exit the while loop
       if(IRVal < IRThreshold){
         teaServo.write(STOP);
         bagDropped = true;
@@ -166,25 +175,20 @@ void loop(){
       
     }
   
-    //sugar and tea dispensed, wait 55000 for the water to heat up
+    //sugar and tea dispensed, wait for the water to heat up
     Serial.println("Waiting for water to heat");
-    delay(55000);
+    delay(heatTime);
     
-    //once water is heated, pour for 13 seconds
+    //once water is heated, pour it into the cup
     Serial.println("Pouring water now");
     POURServo.write(POUR);
-    delay(13000);
+    delay(pourTime);
     POURServo.write(notPOUR);
   
-  
+    
     Serial.println("Enjoy Your Tea!");
     makeTea = false;
   }
-  
-  
-  
-  
-  
   
   
   
