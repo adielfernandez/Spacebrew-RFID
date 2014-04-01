@@ -40,8 +40,10 @@ void setup(){
   sb = new Spacebrew( this );
   
   //Create a subscriber to receive the requested number of sugars desired in the tea. 
-  //This app needs no publishers for now
+  //The first argument is the name of the subscriber we'll be receiving values in later
+  //the second is the type of data we want to be set up to receive on this subscriber 
   sb.addSubscribe ("Number of sugars", "string");
+  //This app needs no publishers for now
 
 
   //Start the connection to the server based on the parameters set above
