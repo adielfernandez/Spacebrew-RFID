@@ -11,6 +11,7 @@ JSONObject outgoing = new JSONObject();
 
 int x = 0;
 int y = 0;
+int red, green, blue;
 
 color newColor = color(0, 0, 0);
 
@@ -26,30 +27,33 @@ void draw(){
   background(255);
 
   noStroke();
-  fill(newColor);
+//  fill(newColor);
+  fill(red, green, blue);
   ellipse(x, y, 50, 50);
     
   
 }
 
 void onCustomMessage( String name, String type, String value ){
+  
+  println("we got something");
+  
   if ( type.equals("paintval") ){
+
+    println("we got a paintval");
     // parse JSON!
     JSONObject m = JSONObject.parse( value );
     
     x = m.getInt("x");
     y = m.getInt("y");
+    red = m.getInt("r");
+    green = m.getInt("g");
+    blue = m.getInt("b");
+//    newColor = color(m.getInt("r"), m.getInt("g"), m.getInt("b"));
     
-    newColor = color(m.getInt("r"), m.getInt("g"), m.getInt("b"));
-    
-  
+    println("X: " + x + " Y: " + y + " R: " + red + " G: " + green + " B: " + blue);
     
   }
   
-  
-  
-  
-  
-  
-  
+
 }
