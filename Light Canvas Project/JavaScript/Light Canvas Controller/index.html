@@ -4,15 +4,136 @@
     <title>Light Canvas Controller</title>
 
     <meta charset="utf-8">
-    <link rel="stylesheet" href="css/reset.css" type="text/css" media="screen" charset="utf-8" />
-    <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+<!--     <link rel="stylesheet" href="css/reset.css" type="text/css" media="screen" charset="utf-8" />
+    <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" /> -->
 
     <!--Here we need to add JQuery and also the library JQuery UI Touch, that makes interfacing with mobile browsers easier. We’ll also at the JS wrapper for Spacebrew-->    
-
+    <link rel="stylesheet" href="css/ui-lightness/jquery-ui-1.10.4.custom.css" rel="stylesheet">
     <script type="text/javascript" src="js/jq.js"></script>
 	<script type="text/javascript" src="js/jquery.ui.touch.js"></script>
+    <script src="js/jquery-1.10.2.js"></script>
+  	<script src="js/jquery-ui-1.10.4.custom.js"></script>
 	<script type="text/javascript" src="js/sb-1.3.0.js"></script>
-    <script type="text/javascript">
+    
+
+	<style>
+	  #red {
+	    float: left;
+	    clear: left;
+	    width: 100%;
+	    margin-top: 0px;
+	    /*position: fixed;*/
+	    top: 100%;
+	    margin-left: 0px;
+	  }
+
+	  #everything {
+	  	width: 100%;
+	  }
+
+	  #green {
+	    float: left;
+	    clear: left;
+	    width: 100%;
+	    margin-top: 0px;
+	    margin-left: 0px;
+	    top: 0px;
+	        
+	  }
+
+	  #blue {
+	    float: left;
+	    clear: left;
+	    width: 100%;
+	    margin-left: 0px;
+	    margin-top: 0px;
+	    top: 0px;
+	        
+	  }
+	  #swatch {
+	    width: 100%;5
+	    height: 300px;
+	    margin-top: 5px;
+	    margin-left: 0px;
+	    background-image: none;
+	  }
+
+	  #text {
+	    text-align:center;
+	    
+		margin-top:  0px;
+	/*	float: left;*/
+		margin-left: 0px;
+		top: 0px;
+		left: 0px;
+font-family: helvetica neue;
+text-transform:uppercase;
+font-weight: 300px;
+	  }
+	  #red .ui-slider-range { background: #ef2929; }
+	  #red .ui-slider-handle { border-color: #ef2929; }
+	  #green .ui-slider-range { background: #8ae234; }
+	  #green .ui-slider-handle { border-color: #8ae234; }
+	  #blue .ui-slider-range { background: #729fcf; }
+	  #blue .ui-slider-handle { border-color: #729fcf; }
+	
+	</style>
+
+	<script type="text/javascript">
+// close the div in 5 secs
+window.setTimeout("closeHelpDiv();", 5000);
+
+function closeHelpDiv(){
+document.getElementById("text").style.display=" none";
+}
+</script>
+
+	<script>
+	
+	$("#hide").click(function(){
+	  $("text").hide();
+	});
+
+	$("#show").click(function(){
+	  $("text").show();
+	});
+	  function hexFromRGB(r, g, b) {
+	    var hex = [
+	      r.toString( 16 ),
+	      g.toString( 16 ),
+	      b.toString( 16 )
+	    ];
+	    $.each( hex, function( nr, val ) {
+	      if ( val.length === 1 ) {
+	        hex[ nr ] = "0" + val;
+	      }
+	    });
+	    return hex.join( "" ).toUpperCase();
+	  }
+	  function refreshSwatch() {
+	    var red = $( "#red" ).slider( "value" ),
+	      green = $( "#green" ).slider( "value" ),
+	      blue = $( "#blue" ).slider( "value" ),
+	      hex = hexFromRGB( red, green, blue );
+	    $( "#swatch" ).css( "background-color", "#" + hex );
+	  }
+	  $(function() {
+	    $( "#red, #green, #blue" ).slider({
+	      orientation: "horizontal",
+	      range: "min",
+	      max: 255,
+	      value: 127,
+	      slide: refreshSwatch,
+	      change: refreshSwatch
+	    });
+	    $( "#red" ).slider( "value", 255 );
+	    $( "#green" ).slider( "value", 140 );
+	    $( "#blue" ).slider( "value", 60 );
+	  });
+
+	  </script>
+
+	  <script type="text/javascript">
 
     	//First thing, tell your JS that it should run the Setup() function only once, when the window loads.
 		$(window).on("load", setup);
@@ -51,7 +172,31 @@
 			//Listen to the mouse: taps in mobile work as mouse events as well. We’ll define what happens in each of these functions further down in the code. Don’t forget the closing bracket for our opening function. 
 			$("body").bind('mousedown', onMouseDown)
 			$("body").bind('mouseup', onMouseUp)
+
+			var boxWidth = "" + innerHeight - 100 + "px";
+
+			document.getElementById("everything").style.width=boxWidth;
+			document.getElementById("swatch").style.height=boxWidth;
+
+			var redBarPos = "" + innerHeight - 90 + "px";
+			document.getElementById("red").style.top=redBarPos;
+
+			var greenBarPos = "" + innerHeight - 82 + "px";
+			document.getElementById("green").style.top=greenBarPos;
+
+			var blueBarPos = "" + innerHeight - 74 + "px";
+			document.getElementById("blue").style.top=blueBarPos;
+
+			var textPos = "" + innerHeight - 100 + "px";
+			document.getElementById("text").style.top=textPos;
+			document.getElementById("text").style.left=textPos;
+
+			console.log("function has been run");
+
+
 		}	
+
+
 
 		//Function that is called when Spacebrew connection is established. It will write the name of our Spacebrew App to our HTML Document.
 		function onOpen() {
@@ -61,15 +206,22 @@
 
 		//This is called when our Swipe starts. We define our state as “0”, as it’s called when the finger touches the screen, and get the X and Y positions using the clientX and clientY variables.
 		function onMouseDown (evt){
-			var red = 255;
-			var green = 200;
-			var blue = 0;
+			// var red = 255;
+			// var green = 200;
+			// var blue = 0;
+
+			var red = $( "#red" ).slider( "value" ),
+	      		green = $( "#green" ).slider( "value" ),
+	      		blue = $( "#blue" ).slider( "value" );
 
 			// var paintSend = {x:evt.clientX,y:evt.clientY,r:red,g:green,b:blue};
-			var paintSend = "{x:" + evt.clientX + ",y:" + evt.clientY + ",r:" + red + ",g:" + green + ",b:" + blue + "}";
+			if (evt.clientY < innerHeight - 90 && evt.clientX < innerHeight - 90) {
+				var paintSend = "{x:" + evt.clientX + ",y:" + evt.clientY + ",r:" + red + ",g:" + green + ",b:" + blue + "}";
 
-			console.log (paintSend);
-			sb.send("paint", "paintval", paintSend);  
+				console.log (paintSend);
+				sb.send("paint", "paintval", paintSend);  
+
+			};
 		}  
 
 		//Same thing as before, but now state is “1”, as it’s called when the finger is lifted from the screen.
@@ -84,13 +236,30 @@
 		}
 
 	</script>
+
+
 	</head>
 
-	<body>
-		<h1>
-			Send paint
-		</h1>
+	<body class="ui-widget-content" style="border:0;" id="everything">
+	 
+	 
+	<div id="red"></div>
+	<div id="green"></div>
+	<div id="blue"></div>
 
+	<!-- <div id="text"> -->
+	<!-- <font size="3" color="black" >Touch the area of the canvas <br> you want to color</font></div> -->
+	 
+	<div id="swatch" class="ui-widget-content ui-corner-all">
+		<p id="text">
+			Touch the area of the canvas <br> you want to color
+		</p> 
+
+	</div>
+
+	  
+
+ 
 	</body>
 
 </html>

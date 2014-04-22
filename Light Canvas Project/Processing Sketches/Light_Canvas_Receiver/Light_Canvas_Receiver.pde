@@ -9,27 +9,26 @@ Spacebrew sb;
 // set up JSON to be sent!
 JSONObject outgoing = new JSONObject();
 
-int x = 0;
-int y = 0;
+int x = -50;
+int y = -50;
 int red, green, blue;
 
 color newColor = color(0, 0, 0);
 
 void setup(){
-  size(800,600);
+  size(500,500);
   sb = new Spacebrew( this );
 //  sb.addPublish ("p5Point", "point2d", outgoing.toString());
   sb.addSubscribe ("paint", "paintval");
   sb.connect(server, name, description);
+  
+  background(0);
+
 }
 
 void draw(){
-  background(255);
 
-  noStroke();
-//  fill(newColor);
-  fill(red, green, blue);
-  ellipse(x, y, 50, 50);
+
     
   
 }
@@ -44,14 +43,20 @@ void onCustomMessage( String name, String type, String value ){
     // parse JSON!
     JSONObject m = JSONObject.parse( value );
     
-    x = m.getInt("x");
-    y = m.getInt("y");
+    x = int(map(m.getInt("x"), 0, 300, 0, width));
+    y = int(map(m.getInt("y"), 0, 300, 0, height));
     red = m.getInt("r");
     green = m.getInt("g");
     blue = m.getInt("b");
 //    newColor = color(m.getInt("r"), m.getInt("g"), m.getInt("b"));
     
     println("X: " + x + " Y: " + y + " R: " + red + " G: " + green + " B: " + blue);
+    
+    noStroke();
+    fill(red, green, blue, 255 * 0.4);
+    ellipse(x, y, 100, 100);
+
+    
     
   }
   
