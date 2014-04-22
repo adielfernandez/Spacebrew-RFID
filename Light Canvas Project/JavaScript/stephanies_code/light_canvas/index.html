@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>jQuery UI Slider - Colorpicker</title>
+  <link rel="stylesheet" href="css/ui-lightness/jquery-ui-1.10.4.custom.css" rel="stylesheet">
+  <script src="js/jquery-1.10.2.js"></script>
+  <script src="js/jquery-ui-1.10.4.custom.js"></script>
+  <link rel="stylesheet" href="/resources/demos/style.css">
+  <style>
+  #red {
+    float: left;
+    clear: left;
+    width: 200px;
+    margin-top: 310px;
+    margin-left: 45px;
+  }
+
+  #green, #blue {
+    float: left;
+    clear: left;
+    width: 200px;
+    margin-left: 45px;
+    margin-top: 5px;
+        
+  }
+  #swatch {
+    width: 300px;
+    height: 300px;
+    margin-top: 5px;
+    margin-left: 0px;
+    background-image: none;
+  }
+
+  #text {
+    text-align:center;
+    
+margin-top: -225px;
+float: left;
+margin-left: -190px;
+  }
+  #red .ui-slider-range { background: #ef2929; }
+  #red .ui-slider-handle { border-color: #ef2929; }
+  #green .ui-slider-range { background: #8ae234; }
+  #green .ui-slider-handle { border-color: #8ae234; }
+  #blue .ui-slider-range { background: #729fcf; }
+  #blue .ui-slider-handle { border-color: #729fcf; }
+  </style>
+  <script>
+$("#hide").click(function(){
+  $("text").hide();
+});
+
+$("#show").click(function(){
+  $("text").show();
+});
+  function hexFromRGB(r, g, b) {
+    var hex = [
+      r.toString( 16 ),
+      g.toString( 16 ),
+      b.toString( 16 )
+    ];
+    $.each( hex, function( nr, val ) {
+      if ( val.length === 1 ) {
+        hex[ nr ] = "0" + val;
+      }
+    });
+    return hex.join( "" ).toUpperCase();
+  }
+  function refreshSwatch() {
+    var red = $( "#red" ).slider( "value" ),
+      green = $( "#green" ).slider( "value" ),
+      blue = $( "#blue" ).slider( "value" ),
+      hex = hexFromRGB( red, green, blue );
+    $( "#swatch" ).css( "background-color", "#" + hex );
+  }
+  $(function() {
+    $( "#red, #green, #blue" ).slider({
+      orientation: "horizontal",
+      range: "min",
+      max: 255,
+      value: 127,
+      slide: refreshSwatch,
+      change: refreshSwatch
+    });
+    $( "#red" ).slider( "value", 255 );
+    $( "#green" ).slider( "value", 140 );
+    $( "#blue" ).slider( "value", 60 );
+  });
+
+  </script>
+</head>
+
+<!--  <font size="3" color="red">Red</font> -->
+<body class="ui-widget-content" style="border:0;">
+ 
+ 
+<div id="red"></div>
+<div id="green"></div>
+<div id="blue"></div>
+ 
+<div id="swatch" class="ui-widget-content ui-corner-all">
+   </div>
+  <div id="text">
+<font size="3" color="black" >Touch the area of the canvas <br> you want to color</font></div>
+
+ 
+</body>
+</html>
