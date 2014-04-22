@@ -1,0 +1,96 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+    <title>Light Canvas Controller</title>
+
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="css/reset.css" type="text/css" media="screen" charset="utf-8" />
+    <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+    <!--Here we need to add JQuery and also the library JQuery UI Touch, that makes interfacing with mobile browsers easier. We’ll also at the JS wrapper for Spacebrew-->    
+
+    <script type="text/javascript" src="js/jq.js"></script>
+	<script type="text/javascript" src="js/jquery.ui.touch.js"></script>
+	<script type="text/javascript" src="js/sb-1.3.0.js"></script>
+    <script type="text/javascript">
+
+    	//First thing, tell your JS that it should run the Setup() function only once, when the window loads.
+		$(window).on("load", setup);
+	      
+		//Declare 2 variables, one will hold the Spacebrew Object, the other will hold the app name.
+		var sb;
+		var app_name;
+
+		//Inside our setup function, we’ll put everything that will be established as soon as we open the page in a browser.
+		function setup (){
+
+			//setting the app name (as we're using the sandbox server, name it something you'll be able to identify easily)
+			
+			var random_id = "0000" //+ Math.floor(Math.random() * 10000)
+			//var random_id = "0000" + 1234
+				;
+
+			app_name = "Light Canvas App " + random_id.substring(random_id.length-4);
+			// create spacebrew client object
+			sb = new Spacebrew.Client();
+
+			// set the base description
+			sb.name(app_name);
+			sb.description("Sends X, Y and RGB values on an accelerometer shake");
+
+			//Configure the publisher that will send the custom value. First is the name of the instance, second the name of your custom variable and last, the format of the JSON to be sent.
+			sb.addPublish( "paint", "paintval", {x:0,y:0,r:0,g:0,b:0} );
+
+			//Override Spacebrew events - this is how you catch events coming from Spacebrew
+			sb.onCustomMessage = onCustomMessage;
+			sb.onOpen = onOpen;
+
+			//Connect to spacbrew
+			sb.connect();
+
+			//Listen to the mouse: taps in mobile work as mouse events as well. We’ll define what happens in each of these functions further down in the code. Don’t forget the closing bracket for our opening function. 
+			$("body").bind('mousedown', onMouseDown)
+			$("body").bind('mouseup', onMouseUp)
+		}	
+
+		//Function that is called when Spacebrew connection is established. It will write the name of our Spacebrew App to our HTML Document.
+		function onOpen() {
+			var message = "Connected as <strong>" + sb.name() + "</strong>. ";
+			$("#name").html( message );
+		}
+
+		//This is called when our Swipe starts. We define our state as “0”, as it’s called when the finger touches the screen, and get the X and Y positions using the clientX and clientY variables.
+		function onMouseDown (evt){
+			var red = 255;
+			var green = 200;
+			var blue = 0;
+
+			// var paintSend = {x:evt.clientX,y:evt.clientY,r:red,g:green,b:blue};
+			var paintSend = "{x:" + evt.clientX + ",y:" + evt.clientY + ",r:" + red + ",g:" + green + ",b:" + blue + "}";
+
+			console.log (paintSend);
+			sb.send("paint", "paintval", paintSend);  
+		}  
+
+		//Same thing as before, but now state is “1”, as it’s called when the finger is lifted from the screen.
+		function onMouseUp (evt){
+			// var mouse = {state:1, x:evt.clientX, y:evt.clientY};
+			// console.log (mouse);
+			// sb.send("point", "point2d", mouse);    
+		}
+
+		//Function declaration that must exist to run Spacebrew, even if it’s not receiving custom messages.
+		function onCustomMessage( name, value, type ){
+		}
+
+	</script>
+	</head>
+
+	<body>
+		<h1>
+			Send paint
+		</h1>
+
+	</body>
+
+</html>
