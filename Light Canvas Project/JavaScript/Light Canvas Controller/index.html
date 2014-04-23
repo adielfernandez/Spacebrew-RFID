@@ -2,7 +2,7 @@
 <html>
 	<head>
     <title>Light Canvas Controller</title>
-
+	<meta name="viewport" content="width=400, initial-scale=1">
     <meta charset="utf-8">
 <!--     <link rel="stylesheet" href="css/reset.css" type="text/css" media="screen" charset="utf-8" />
     <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" /> -->
@@ -173,11 +173,29 @@ document.getElementById("text").style.display=" none";
 			$("body").bind('mousedown', onMouseDown)
 			$("body").bind('mouseup', onMouseUp)
 
+			//run sizing stuff once in setup
+			var boxWidth = "" + innerHeight - 100 + "px";
+
+			document.getElementById("everything").style.width=boxWidth;
+			document.getElementById("swatch").style.height=boxWidth;
+
+			var redBarPos = "" + innerHeight - 90 + "px";
+			document.getElementById("red").style.top=redBarPos;
+
+			var greenBarPos = "" + innerHeight - 82 + "px";
+			document.getElementById("green").style.top=greenBarPos;
+
+			var blueBarPos = "" + innerHeight - 74 + "px";
+			document.getElementById("blue").style.top=blueBarPos;
+
+			var textPos = "" + innerHeight - 100 + "px";
+			document.getElementById("text").style.top=textPos;
+			document.getElementById("text").style.left=textPos;
 
 
 		}	
 
-
+		//then run sizing stuff again every 100 milliseconds
 		function update(){
 
 
@@ -199,13 +217,11 @@ document.getElementById("text").style.display=" none";
 			document.getElementById("text").style.top=textPos;
 			document.getElementById("text").style.left=textPos;
 
-			console.log("function has been run");
-
 		}
 
 
 
-		setInterval(update, 500);
+		setInterval(update, 100);
 
 		//Function that is called when Spacebrew connection is established. It will write the name of our Spacebrew App to our HTML Document.
 		function onOpen() {
