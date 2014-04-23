@@ -173,6 +173,14 @@ document.getElementById("text").style.display=" none";
 			$("body").bind('mousedown', onMouseDown)
 			$("body").bind('mouseup', onMouseUp)
 
+
+
+		}	
+
+
+		function update(){
+
+
 			var boxWidth = "" + innerHeight - 100 + "px";
 
 			document.getElementById("everything").style.width=boxWidth;
@@ -193,10 +201,11 @@ document.getElementById("text").style.display=" none";
 
 			console.log("function has been run");
 
+		}
 
-		}	
 
 
+		setInterval(update, 500);
 
 		//Function that is called when Spacebrew connection is established. It will write the name of our Spacebrew App to our HTML Document.
 		function onOpen() {
