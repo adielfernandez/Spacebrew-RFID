@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>canvascolorpicker</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="An advanced responsive color selector with color swatches and support for human perceived lightness. Works in all modern browsers and on touch devices.">
+        <meta name="author" content="István Ujj-Mészáros">
+
+        <link href="bootstrap/css/bootstrap.css" rel="stylesheet" type="text/css" media="all">
+        <link href="libraries/prettify/prettify.css" rel="stylesheet" type="text/css" media="all">
+        <link href="demo.css" rel="stylesheet" type="text/css" media="all">
+        <link href="jquery-colorpickersliders/jquery.colorpickersliders.css" rel="stylesheet" type="text/css" media="all">
+
+        <script src="libraries/jquery-1.9.0.min.js"></script>
+        <script src="bootstrap/js/bootstrap.min.js"></script>
+        <script src="libraries/prettify/prettify.js"></script>
+        <script src="libraries/tinycolor.js"></script>
+        <script src="jquery-colorpickersliders/jquery.colorpickersliders.js"></script>
+
+
+        <STYLE>
+
+        @media only screen and (orientation: landscape) {
+ #preview { left: -10px; display: none;
+    position: relative;
+    width: 100%; border: 0; background: none; margin-top: 45px;}
+
+     /*.cp-container.cp-preview.input {margin-top: 137px;}*/
+
+
+}
+
+
+.cp-container .cp-slider {border: none;
+width: 104%;
+bottom: 0px;
+position: fixed;
+left: -15px;}
+
+
+
+
+#preview { display: block;
+    position: relative; left: -5px; position: relative;
+    width: 100%; border: 0; background: none; margin-top: 5px;}
+
+    .dummyclass {padding-top: 100%;}
+
+    .cp-container .cp-slider span, .cp-container .cp-preview input {height: 255% !important;}
+
+    .cp-container.cp-preview.input {margin-top: 37px;}
+
+    .textinput { padding-top: 100% !important; position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;font-size: 0 !important;}
+    /*top:0;left:0;bottom:0;right:20%;}*/
+        .cp-swatches {display: none !important;}
+        .cp-slider.cp-cielightness.cp-transparency{display: none !important;}
+        .cp-slider.cp-ciechroma.cp-transparency{display: none !important;}
+        .cp-slider.cp-ciehue.cp-transparency{display: none !important;}
+        .cp-slider.cp-hslsaturation.cp-transparency{display: none !important;}
+        .cp-slider.cp-hsllightness.cp-transparency{display: none !important; }
+        .cp-slider.cp-opacity.cp-transparency{display: none !important;}
+        .textspan {display: block; margin-top: 60px; font-size: 14px; position: fixed; width: 90%; margin-left: 10px; margin-right: 30px; text-align: center; z-index: 1000000000000000; padding-top: 40%; bottom: 105px; left: 2px;}
+
+
+        </style>
+
+
+    </head>
+
+    <body>
+
+        <div class="container">
+
+           
+
+         <span class="textspan">Pick your color on the slider and then touch the area of the canvas you want to paint</span>
+            <span class="demo1"></span>
+            <script>
+                $(".demo1").ColorPickerSliders({
+                    flat: true,
+                    color: 'orange',
+                    order: {
+                        cie: 1,
+                        hsl: 2,
+                        opacity: 3,
+                        preview: 4
+                    },
+                    labels: {
+                        cielightness: 'Human perceived lightness',
+                        ciechroma: 'CIE Chroma',
+                        ciehue: 'CIE Hue'
+                    }
+                });
+            </script>
+
+            
+
+                <script>
+                    $('.updatecolor').on('click', function(e) {
+                        $(".demo1").trigger('colorpickersliders.updateColor', $(this).data("updatecolor"));
+                    });
+                </script>
+
+           
+
+        <script>
+            prettyPrint();
+        </script>
