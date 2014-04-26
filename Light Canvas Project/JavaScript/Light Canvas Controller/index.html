@@ -2,7 +2,7 @@
 <html>
 	<head>
     <title>Light Canvas Controller</title>
-	<meta name="viewport" content="width=400, initial-scale=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="utf-8">
 <!--     <link rel="stylesheet" href="css/reset.css" type="text/css" media="screen" charset="utf-8" />
     <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" /> -->
@@ -70,7 +70,7 @@ font-family: helvetica neue;
 text-transform:uppercase;
 font-weight: 300px;
 	  }
-	  #red .ui-slider-range { background: #ef2929; }
+	  #red .ui-slider-range { background: #FFFFFF; }
 	  #red .ui-slider-handle { border-color: #ef2929; }
 	  #green .ui-slider-range { background: #8ae234; }
 	  #green .ui-slider-handle { border-color: #8ae234; }
@@ -81,7 +81,7 @@ font-weight: 300px;
 
 	<script type="text/javascript">
 // close the div in 5 secs
-window.setTimeout("closeHelpDiv();", 5000);
+window.setTimeout("closeHelpDiv();", 6000);
 
 function closeHelpDiv(){
 document.getElementById("text").style.display=" none";
@@ -110,13 +110,56 @@ document.getElementById("text").style.display=" none";
 	    });
 	    return hex.join( "" ).toUpperCase();
 	  }
+
+	  	function HSVtoRGBtoHex(h, s, v) {
+		    var r, g, b, i, f, p, q, t;
+		    if (h && s === undefined && v === undefined) {
+		        s = h.s, v = h.v, h = h.h;
+		    }
+		    i = Math.floor(h * 6);
+		    f = h * 6 - i;
+		    p = v * (1 - s);
+		    q = v * (1 - f * s);
+		    t = v * (1 - (1 - f) * s);
+		    switch (i % 6) {
+		        case 0: r = v, g = t, b = p; break;
+		        case 1: r = q, g = v, b = p; break;
+		        case 2: r = p, g = v, b = t; break;
+		        case 3: r = p, g = q, b = v; break;
+		        case 4: r = t, g = p, b = v; break;
+		        case 5: r = v, g = p, b = q; break;
+		    }
+
+		        r = Math.floor(r * 255);
+		        g = Math.floor(g * 255);
+		        b = Math.floor(b * 255);
+
+		    var hex = [
+		      r.toString( 16 ),
+		      g.toString( 16 ),
+		      b.toString( 16 )
+		    ];
+		    $.each( hex, function( nr, val ) {
+		      if ( val.length === 1 ) {
+		        hex[ nr ] = "0" + val;
+		      }
+		    });
+		    return hex.join( "" ).toUpperCase();
+
+		}
+
+
+
 	  function refreshSwatch() {
 	    var red = $( "#red" ).slider( "value" ),
 	      green = $( "#green" ).slider( "value" ),
 	      blue = $( "#blue" ).slider( "value" ),
-	      hex = hexFromRGB( red, green, blue );
+	      hex = HSVtoRGBtoHex( red/255, 1.0, 1.0 );
 	    $( "#swatch" ).css( "background-color", "#" + hex );
+	    
 	  }
+
+
 	  $(function() {
 	    $( "#red, #green, #blue" ).slider({
 	      orientation: "horizontal",
@@ -131,9 +174,7 @@ document.getElementById("text").style.display=" none";
 	    $( "#blue" ).slider( "value", 60 );
 	  });
 
-	  </script>
 
-	  <script type="text/javascript">
 
     	//First thing, tell your JS that it should run the Setup() function only once, when the window loads.
 		$(window).on("load", setup);
@@ -142,12 +183,22 @@ document.getElementById("text").style.display=" none";
 		var sb;
 		var app_name;
 
+
+		var squareDimension;
+
+		if(innerHeight > innerWidth){
+			squareDimension = innerWidth;
+		} else if(innerHeight <= innerWidth){
+			squareDimension = innerHeight
+		};
+
+
 		//Inside our setup function, we’ll put everything that will be established as soon as we open the page in a browser.
 		function setup (){
 
 			//setting the app name (as we're using the sandbox server, name it something you'll be able to identify easily)
 			
-			var random_id = "0000" //+ Math.floor(Math.random() * 10000)
+			var random_id = "0000" + Math.floor(Math.random() * 10000)
 			//var random_id = "0000" + 1234
 				;
 
@@ -160,7 +211,7 @@ document.getElementById("text").style.display=" none";
 			sb.description("Sends X, Y and RGB values on an accelerometer shake");
 
 			//Configure the publisher that will send the custom value. First is the name of the instance, second the name of your custom variable and last, the format of the JSON to be sent.
-			sb.addPublish( "paint", "paintval", {x:0,y:0,r:0,g:0,b:0} );
+			sb.addPublish( "paint", "paintval", {x:0,y:0,h:0} );
 
 			//Override Spacebrew events - this is how you catch events coming from Spacebrew
 			sb.onCustomMessage = onCustomMessage;
@@ -179,16 +230,16 @@ document.getElementById("text").style.display=" none";
 			document.getElementById("everything").style.width=boxWidth;
 			document.getElementById("swatch").style.height=boxWidth;
 
-			var redBarPos = "" + innerHeight - 90 + "px";
+			var redBarPos = "" + squareDimension - 90 + "px";
 			document.getElementById("red").style.top=redBarPos;
 
-			var greenBarPos = "" + innerHeight - 82 + "px";
-			document.getElementById("green").style.top=greenBarPos;
+			// var greenBarPos = "" + squareDimension - 82 + "px";
+			// document.getElementById("green").style.top=greenBarPos;
 
-			var blueBarPos = "" + innerHeight - 74 + "px";
-			document.getElementById("blue").style.top=blueBarPos;
+			// var blueBarPos = "" + squareDimension - 74 + "px";
+			// document.getElementById("blue").style.top=blueBarPos;
 
-			var textPos = "" + innerHeight - 100 + "px";
+			var textPos = "" + squareDimension - 100 + "px";
 			document.getElementById("text").style.top=textPos;
 			document.getElementById("text").style.left=textPos;
 
@@ -199,23 +250,33 @@ document.getElementById("text").style.display=" none";
 		function update(){
 
 
-			var boxWidth = "" + innerHeight - 100 + "px";
+			if(innerHeight > innerWidth){
+				squareDimension = innerWidth;
+			} else if(innerHeight <= innerWidth){
+				squareDimension = innerHeight
+			};
+
+
+			var boxWidth = "" + squareDimension - 100 + "px";
 
 			document.getElementById("everything").style.width=boxWidth;
 			document.getElementById("swatch").style.height=boxWidth;
 
-			var redBarPos = "" + innerHeight - 90 + "px";
+			var redBarPos = "" + squareDimension - 90 + "px";
 			document.getElementById("red").style.top=redBarPos;
 
-			var greenBarPos = "" + innerHeight - 82 + "px";
-			document.getElementById("green").style.top=greenBarPos;
+			// var greenBarPos = "" + squareDimension - 82 + "px";
+			// document.getElementById("green").style.top=greenBarPos;
 
-			var blueBarPos = "" + innerHeight - 74 + "px";
-			document.getElementById("blue").style.top=blueBarPos;
+			// var blueBarPos = "" + squareDimension - 74 + "px";
+			// document.getElementById("blue").style.top=blueBarPos;
 
-			var textPos = "" + innerHeight - 100 + "px";
+			var textPos = "" + squareDimension - 100 + "px";
 			document.getElementById("text").style.top=textPos;
 			document.getElementById("text").style.left=textPos;
+
+
+
 
 		}
 
@@ -235,13 +296,18 @@ document.getElementById("text").style.display=" none";
 			// var green = 200;
 			// var blue = 0;
 
-			var red = $( "#red" ).slider( "value" ),
+			var hue = $( "#red" ).slider( "value" ),
 	      		green = $( "#green" ).slider( "value" ),
 	      		blue = $( "#blue" ).slider( "value" );
 
 			// var paintSend = {x:evt.clientX,y:evt.clientY,r:red,g:green,b:blue};
-			if (evt.clientY < innerHeight - 90 && evt.clientX < innerHeight - 90) {
-				var paintSend = "{x:" + evt.clientX + ",y:" + evt.clientY + ",r:" + red + ",g:" + green + ",b:" + blue + "}";
+			if (evt.clientY < squareDimension - 90 && evt.clientX < squareDimension - 90) {
+
+				//x and y are normalized to 500
+				var xVal = Math.round(evt.clientX/squareDimension * 500);
+				var yVal = Math.round(evt.clientY/squareDimension * 500);
+
+				var paintSend = "{x:" + xVal + ",y:" + yVal + ",h:" + hue + "}";
 
 				console.log (paintSend);
 				sb.send("paint", "paintval", paintSend);  
@@ -269,15 +335,19 @@ document.getElementById("text").style.display=" none";
 	 
 	 
 	<div id="red"></div>
-	<div id="green"></div>
-	<div id="blue"></div>
+<!-- 	<div id="green"></div>
+	<div id="blue"></div> -->
 
 	<!-- <div id="text"> -->
 	<!-- <font size="3" color="black" >Touch the area of the canvas <br> you want to color</font></div> -->
 	 
 	<div id="swatch" class="ui-widget-content ui-corner-all">
 		<p id="text">
-			Touch the area of the canvas <br> you want to color
+			Touch the area of the canvas<br>you want to color
+			<br>
+			<br>
+			Change the hue with<br>the sliderbelow
+
 		</p> 
 
 	</div>

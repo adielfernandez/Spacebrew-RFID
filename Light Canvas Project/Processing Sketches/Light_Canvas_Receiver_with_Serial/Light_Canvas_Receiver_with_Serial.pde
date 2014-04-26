@@ -1,5 +1,10 @@
 import spacebrew.*;
 
+
+import processing.serial.*;
+Serial port;
+
+
 String server= "sandbox.spacebrew.cc";
 String name="Light Canvas Controller";
 String description ="Receives x,y and RGB data from phones";
@@ -14,12 +19,13 @@ JSONObject outgoing = new JSONObject();
 int canvasSide = 500;
 int gap = 0;
 
+color drawing = color(0,255,255);
 
 
 //arrays that store the 
-int numPixels = 576;
+int numPixels = 24;
 int hueVals[] = new int[numPixels];
-
+color colorVals[] = new color[numPixels];
 
 float pixelsPerSide = 24;
 float pixelSpacing = canvasSide/pixelsPerSide;
@@ -28,6 +34,8 @@ boolean updatePixels = false;
 
 
 int sendingPixel = 0;
+float test = 0;
+
 
 void setup() {
   size(1000, 500);
@@ -35,6 +43,20 @@ void setup() {
   //  sb.addPublish ("p5Point", "point2d", outgoing.toString());
   sb.addSubscribe ("paint", "paintval");
   sb.connect(server, name, description);
+
+  // List all the available serial ports
+  printArray(Serial.list());
+
+  // Choose the proper serial port from the list printed and insert number between square brackets
+  port = new Serial(this, Serial.list()[13], 115200);
+
+  for(int i = 0; i < 24; i++){
+//    hueVals[i] = i * 255/24;
+    hueVals[i] = 0;    
+    
+  }
+
+
 
   background(0);
   colorMode(HSB, 255);
@@ -44,33 +66,71 @@ void setup() {
 void draw() {
 
   //go through output and get color values for pixels
-
-  if (millis() % 500 < 20) {
+  if (millis() % 100 < 20) {
     for (int i = 0; i < numPixels; i++) {
       float X = (i * pixelSpacing + pixelSpacing/2) % (pixelSpacing * pixelsPerSide);
       float Y = (i * pixelSpacing - X)/pixelsPerSide + pixelSpacing/2;
       color currentColor = color(get(int(X), int(Y)));
 
       hueVals[i] = int(hue(currentColor));
+      colorVals[i] = currentColor;
       fill(currentColor);
       noStroke();
       ellipse(X + canvasSide + gap, Y, circleSize, circleSize);
+      textSize(10);
+      fill(255);
+      textAlign(CENTER, CENTER);
+      text(str(hueVals[i]), X + canvasSide + gap, Y);
     }
+    
   }
 
 
+      
 
-  //start sending data to arduino
+
+
+      //send pixel info
+//      String pixelData = str(sendingPixel) + "," + str(hueVals[sendingPixel]) + "," + str(255) + "," + str(255) + "\n";  
+      
+      //remap hue from 255, to 360 for arduino to convert hsb to rgb
+      
+      int mappedHue = int(map(hue(colorVals[sendingPixel]), 0, 255, 0, 360));
+      
+      String pixelData = str(sendingPixel) + "," + str(mappedHue) + "," + str(brightness(colorVals[sendingPixel])) + "," + str(saturation(colorVals[sendingPixel])) + "\n";  
+      port.write(pixelData);  
   
+      sendingPixel++;
+      if (sendingPixel > 23) {
+        sendingPixel = 0;
+      }
+
+
+
+
+
+
+
+
+
   
 }
+
+
+
 
 
 
 void keyPressed() {
   if (key == ' ') {
     background(0);
+  } else {
+    drawing = color(random(255), 255, 255);
   }
+  
+  
+  
+  
 }
 
 
@@ -103,20 +163,16 @@ void onCustomMessage( String name, String type, String value ) {
     ellipse(newPaintX, newPaintY, 65, 65);
     ellipse(newPaintX, newPaintY, 30, 30);
   }
-
-
-
 }
 
 void mousePressed() {
   int newPaintX = mouseX;
   int newPaintY = mouseY; 
-
-  int hue = int(random(255));
+ 
 
   pushStyle();
   noStroke();
-  fill(hue, 255, 255, 255 * 0.4);
+  fill(drawing, 255 * 0.4);
   ellipse(newPaintX, newPaintY, 100, 100);
   ellipse(newPaintX, newPaintY, 65, 65);
   ellipse(newPaintX, newPaintY, 30, 30);
@@ -131,11 +187,10 @@ void mouseDragged() {
   int newPaintX = mouseX;
   int newPaintY = mouseY; 
 
-  int hue = int(random(255));
 
   pushStyle();
   noStroke();
-  fill(hue, 255, 255, 255 * 0.4);
+  fill(drawing, 255 * 0.4);
   ellipse(newPaintX, newPaintY, 100, 100);
   ellipse(newPaintX, newPaintY, 65, 65);
   ellipse(newPaintX, newPaintY, 30, 30);
