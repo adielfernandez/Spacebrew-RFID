@@ -30,16 +30,18 @@ color colorVals[] = new color[numPixels];
 float pixelsPerSide = 24;
 float pixelSpacing = canvasSide/pixelsPerSide;
 float circleSize = canvasSide/pixelsPerSide;
-boolean updatePixels = false;
+boolean updatePixels = true;
 
 
 int sendingPixel = 0;
+boolean firstScan = true;
+
 float test = 0;
 
 
 void setup() {
   size(1000, 500);
-//  frameRate(200);
+  //  frameRate(200);
   sb = new Spacebrew( this );
   //  sb.addPublish ("p5Point", "point2d", outgoing.toString());
   sb.addSubscribe ("paint", "paintval");
@@ -67,34 +69,56 @@ void setup() {
 
 void draw() {
 
+    if (millis() % 1000 < 10) {
 
 
+      //go through output and get color values for pixels
+      //  if (millis() % 200 < 20) {
+      for (int i = 0; i < numPixels; i++) {
+        float X = (i * pixelSpacing + pixelSpacing/2) % (pixelSpacing * pixelsPerSide);
+        float Y = (i * pixelSpacing - X)/pixelsPerSide + pixelSpacing/2;
+        color currentColor = color(get(int(X), int(Y)));
 
-
-
-
-
-  //send pixel info
-  //      String pixelData = str(sendingPixel) + "," + str(hueVals[sendingPixel]) + "," + str(255) + "," + str(255) + "\n";  
-
-
-  //remap hue from 255, to 360 for arduino to convert hsb to rgb
-  int mappedHue = int(map(hue(colorVals[sendingPixel]), 0, 255, 0, 360));
-//  if(brightness(colorVals[sendingPixel]) < 2){ 
-//    mappedHue = 361;
-//  }
+        hueVals[i] = int(hue(currentColor));
+        colorVals[i] = currentColor;
+        fill(currentColor);
+        noStroke();
+        ellipse(X + canvasSide + gap, Y, circleSize, circleSize);
+        //      textSize(10);
+        //      fill(255);
+        //      textAlign(CENTER, CENTER);
+        //      text(str(hueVals[i]), X + canvasSide + gap, Y);
+      }
+      
+      
+    }
   
   
 
-  String pixelData = str(sendingPixel) + "," + str(mappedHue) + "," + str(int(brightness(colorVals[sendingPixel]))) + "," + str(int(saturation(colorVals[sendingPixel]))) + "\n";  
-//  String pixelData = str(sendingPixel) + "," + str(mappedHue) + "\n";
+  if (updatePixels) {
 
-  port.write(pixelData);
-  print(pixelData);
-  sendingPixel++;
-  if (sendingPixel > 575) {
-    sendingPixel = 0;
-  }
+
+
+    //remap hue from 255, to 360 for arduino to convert hsb to rgb
+    int mappedHue = int(map(hue(colorVals[sendingPixel]), 0, 255, 0, 360));
+
+    String pixelData = str(sendingPixel) + "," + str(mappedHue) + "," + str(int(brightness(colorVals[sendingPixel]))) + "," + str(int(saturation(colorVals[sendingPixel]))) + "\n";  
+    //  String pixelData = str(sendingPixel) + "," + str(mappedHue) + "\n";
+
+    port.write(pixelData);
+    print(pixelData);
+    sendingPixel++;
+    if (sendingPixel > 575) {
+      sendingPixel = 0;
+
+      updatePixels = false;
+      
+    }
+  } 
+  
+  
+  
+  
 }
 
 
@@ -140,27 +164,11 @@ void onCustomMessage( String name, String type, String value ) {
     ellipse(newPaintX, newPaintY, 100, 100);
     ellipse(newPaintX, newPaintY, 65, 65);
     ellipse(newPaintX, newPaintY, 30, 30);
+
+    updatePixels = true;
   }
 
 
-
-  //go through output and get color values for pixels
-  //  if (millis() % 200 < 20) {
-  for (int i = 0; i < numPixels; i++) {
-    float X = (i * pixelSpacing + pixelSpacing/2) % (pixelSpacing * pixelsPerSide);
-    float Y = (i * pixelSpacing - X)/pixelsPerSide + pixelSpacing/2;
-    color currentColor = color(get(int(X), int(Y)));
-
-    hueVals[i] = int(hue(currentColor));
-    colorVals[i] = currentColor;
-    fill(currentColor);
-    noStroke();
-    ellipse(X + canvasSide + gap, Y, circleSize, circleSize);
-    //      textSize(10);
-    //      fill(255);
-    //      textAlign(CENTER, CENTER);
-    //      text(str(hueVals[i]), X + canvasSide + gap, Y);
-  }
 
   //  }
 }
