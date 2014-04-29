@@ -156,7 +156,7 @@ document.getElementById("text").style.display=" none";
 	      blue = $( "#blue" ).slider( "value" ),
 	      hex = HSVtoRGBtoHex( red/255, 1.0, 1.0 );
 	    $( "#swatch" ).css( "background-color", "#" + hex );
-	    
+	    //"rgb(" + r ","+g+","+b+")"
 	  }
 
 
@@ -169,7 +169,7 @@ document.getElementById("text").style.display=" none";
 	      slide: refreshSwatch,
 	      change: refreshSwatch
 	    });
-	    $( "#red" ).slider( "value", 255 );
+	    $( "#red" ).slider( "value", Math.floor(Math.random()* 255) );
 	    $( "#green" ).slider( "value", 140 );
 	    $( "#blue" ).slider( "value", 60 );
 	  });
@@ -221,8 +221,13 @@ document.getElementById("text").style.display=" none";
 			sb.connect();
 
 			//Listen to the mouse: taps in mobile work as mouse events as well. We’ll define what happens in each of these functions further down in the code. Don’t forget the closing bracket for our opening function. 
-			$("body").bind('mousedown', onMouseDown)
-			$("body").bind('mouseup', onMouseUp)
+			//$("body").bind('mousedown', onMouseDown)
+			//$("body").bind('mouseup', onMouseUp)
+			// $("body").bind('touchstart', onMouseDown)
+			// $("body").bind('touchmove', onMouseDown)
+
+			document.body.addEventListener("touchstart", onMouseDown);
+			document.body.addEventListener("touchmove", onMouseDown);
 
 			//run sizing stuff once in setup
 			var boxWidth = "" + innerHeight - 100 + "px";
@@ -257,12 +262,12 @@ document.getElementById("text").style.display=" none";
 			};
 
 
-			var boxWidth = "" + squareDimension - 100 + "px";
+			var boxWidth = "" + squareDimension - 20 + "px";
 
 			document.getElementById("everything").style.width=boxWidth;
 			document.getElementById("swatch").style.height=boxWidth;
 
-			var redBarPos = "" + squareDimension - 90 + "px";
+			var redBarPos = "" + squareDimension - 10 + "px";
 			document.getElementById("red").style.top=redBarPos;
 
 			// var greenBarPos = "" + squareDimension - 82 + "px";
@@ -292,6 +297,7 @@ document.getElementById("text").style.display=" none";
 
 		//This is called when our Swipe starts. We define our state as “0”, as it’s called when the finger touches the screen, and get the X and Y positions using the clientX and clientY variables.
 		function onMouseDown (evt){
+		  evt.preventDefault();
 			// var red = 255;
 			// var green = 200;
 			// var blue = 0;
@@ -300,19 +306,43 @@ document.getElementById("text").style.display=" none";
 	      		green = $( "#green" ).slider( "value" ),
 	      		blue = $( "#blue" ).slider( "value" );
 
-			// var paintSend = {x:evt.clientX,y:evt.clientY,r:red,g:green,b:blue};
-			if (evt.clientY < squareDimension - 90 && evt.clientX < squareDimension - 90) {
+	      	console.log(evt);
+	      	// touches
+	      	if ( evt.changedTouches ){
 
-				//x and y are normalized to 500
-				var xVal = Math.round(evt.clientX/squareDimension * 500);
-				var yVal = Math.round(evt.clientY/squareDimension * 500);
+				var touches = evt.changedTouches;
+				for (var i=0; i < touches.length; i++) {
+					console.log(touches[i].pageY < squareDimension - 20 && touches[i].pageX < squareDimension - 90);
+					if (touches[i].pageY < squareDimension - 20 && touches[i].pageX < squareDimension - 20) {
 
-				var paintSend = "{x:" + xVal + ",y:" + yVal + ",h:" + hue + "}";
+						//x and y are normalized to 500
+						var xVal = Math.round(touches[i].pageX/squareDimension * 500);
+						var yVal = Math.round(touches[i].pageY/squareDimension * 500);
 
-				console.log (paintSend);
-				sb.send("paint", "paintval", paintSend);  
+						var paintSend = "{x:" + xVal + ",y:" + yVal + ",h:" + hue + "}";
 
-			};
+						console.log (xVal/500);
+						sb.send("paint", "paintval", paintSend);  
+
+					};
+				}
+			} else {
+
+		      	// mouse code
+				// var paintSend = {x:evt.clientX,y:evt.clientY,r:red,g:green,b:blue};
+				if (evt.clientY < squareDimension - 90 && evt.clientX < squareDimension - 90) {
+
+					//x and y are normalized to 500
+					var xVal = Math.round(evt.clientX/squareDimension * 500);
+					var yVal = Math.round(evt.clientY/squareDimension * 500);
+
+					var paintSend = "{x:" + xVal + ",y:" + yVal + ",h:" + hue + "}";
+
+					console.log (paintSend);
+					sb.send("paint", "paintval", paintSend);  
+
+				};
+			}
 		}  
 
 		//Same thing as before, but now state is “1”, as it’s called when the finger is lifted from the screen.

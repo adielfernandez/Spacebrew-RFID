@@ -35,11 +35,11 @@ boolean updatePixels = false;
 
 int sendingPixel = 0;
 float test = 0;
-
+String pixelData = "";
 
 void setup() {
   size(1000, 500);
-//  frameRate(200);
+  //  frameRate(200);
   sb = new Spacebrew( this );
   //  sb.addPublish ("p5Point", "point2d", outgoing.toString());
   sb.addSubscribe ("paint", "paintval");
@@ -53,7 +53,7 @@ void setup() {
 
 
 
-  for (int i = 0; i < 576; i++) {
+  for (int i = 0; i < 24; i++) {
     //    hueVals[i] = i * 255/24;
     hueVals[i] = 0;
   }
@@ -70,31 +70,35 @@ void draw() {
 
 
 
+  if(frameCount % 10 == 0){
 
 
+  pixelData = "";
 
+  for (int i = 0; i < 6; i++) {
+    int mappedHue = int(map(hue(colorVals[sendingPixel + 96 * i]), 0, 255, 0, 360));
 
-  //send pixel info
-  //      String pixelData = str(sendingPixel) + "," + str(hueVals[sendingPixel]) + "," + str(255) + "," + str(255) + "\n";  
+    pixelData = pixelData + str(sendingPixel + 96 * i) + "," + str(mappedHue) + "," + str(int(brightness(colorVals[sendingPixel + 96 * i]))) + "," + str(int(saturation(colorVals[sendingPixel + 96 * i]))); 
 
+    if (i < 5) {
+      pixelData = pixelData + ",";
+    }
+  }
 
-  //remap hue from 255, to 360 for arduino to convert hsb to rgb
-  int mappedHue = int(map(hue(colorVals[sendingPixel]), 0, 255, 0, 360));
-//  if(brightness(colorVals[sendingPixel]) < 2){ 
-//    mappedHue = 361;
-//  }
-  
-  
+  pixelData = pixelData + "\n";
 
-  String pixelData = str(sendingPixel) + "," + str(mappedHue) + "," + str(int(brightness(colorVals[sendingPixel]))) + "," + str(int(saturation(colorVals[sendingPixel]))) + "\n";  
-//  String pixelData = str(sendingPixel) + "," + str(mappedHue) + "\n";
 
   port.write(pixelData);
+  
+  
   print(pixelData);
   sendingPixel++;
-  if (sendingPixel > 575) {
+  if (sendingPixel > 95) {
     sendingPixel = 0;
   }
+  
+}
+  
 }
 
 
